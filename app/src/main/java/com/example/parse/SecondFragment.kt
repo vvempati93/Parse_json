@@ -5,8 +5,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.parse.databinding.FragmentSecondBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
@@ -23,8 +26,8 @@ class SecondFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         _binding = FragmentSecondBinding.inflate(inflater, container, false)
+        displayAndParseJson()
         return binding.root
 
     }
@@ -36,7 +39,12 @@ class SecondFragment : Fragment() {
             findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
         }
     }
-
+    fun displayAndParseJson(){
+        val viewModel = ParseViewModel()
+        lifecycleScope.launch(Dispatchers.IO) {
+            viewModel.parseJson()
+        }
+    }
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
