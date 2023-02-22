@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.parse.databinding.FragmentSecondBinding
@@ -27,8 +28,12 @@ class SecondFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentSecondBinding.inflate(inflater, container, false)
-        displayAndParseJson()
-        return binding.root
+        return ComposeView(requireContext()).apply {
+            setContent {
+                ListComposable(countries = displayAndParseJson())
+            }
+        }
+        //return binding.root
 
     }
 
@@ -39,11 +44,13 @@ class SecondFragment : Fragment() {
             findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
         }
     }
-    fun displayAndParseJson(){
+    fun displayAndParseJson(): List<CountryInfo>?{
         val viewModel = ParseViewModel()
+        var output: List<CountryInfo>? = listOf()
         lifecycleScope.launch(Dispatchers.IO) {
-            viewModel.parseJson()
+            output = viewModel.parseJson()
         }
+        return output
     }
     override fun onDestroyView() {
         super.onDestroyView()
