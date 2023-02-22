@@ -18,6 +18,7 @@ import kotlinx.coroutines.*
 class SecondFragment : Fragment() {
 
     private var _binding: FragmentSecondBinding? = null
+    private val parseViewModel = ParseViewModel()
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -28,12 +29,7 @@ class SecondFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         //_binding = FragmentSecondBinding.inflate(inflater, container, false)
-        val parseViewModel = ViewModelProvider(this).get(ParseViewModel::class.java)
-        GlobalScope.async {
-            withContext(Dispatchers.Main){
-                parseViewModel.parseJson()
-            }
-        }
+
         return ComposeView(requireContext()).apply {
             setContent {
                 ListComposable(parseViewModel)
@@ -41,6 +37,16 @@ class SecondFragment : Fragment() {
         }
         //return binding.root
 
+    }
+
+    fun runJob(){
+        suspend {
+            GlobalScope.async {
+                withContext(Dispatchers.Main) {
+                    parseViewModel.parseJson()
+                }
+            }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
