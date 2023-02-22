@@ -1,6 +1,9 @@
 package com.example.parse
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -15,15 +18,16 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.parse.databinding.ActivityMainBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
+    private val ioScope = CoroutineScope(Dispatchers.IO + Job() )
+    val viewModel: ParseViewModel by viewModels()
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,19 +40,8 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
+        fireAndForgetNetworkCall()
 
-        val viewModel: ParseViewModel by viewModels()
-        try {
-            lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    viewModel.uiState.collect {
-                        viewModel.parseJson()
-                    }
-                }
-            }
-        }catch (e: java.lang.Exception){
-            println("The exception $e")
-        }
 
         binding.fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -56,6 +49,24 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+    fun fireAndForgetNetworkCall() {
+        Log.i("logTag", "-----Async network calls without error handling-----")
+        ioScope.launch {
+            val job = ArrayList<Job>()
+
+            Log.i("logTag", "Making 10 asynchronous network calls")
+            for (i in 0..1) {
+                job.add(launch {
+                    Log.i("logTag", "Network Call ID: $i")
+                    viewModel.parseJson()
+                })
+            }
+
+            job.joinAll()
+            Log.i("logTag", "All Networks calls have completed executing")
+        }
+    }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
