@@ -29,7 +29,7 @@ class SecondFragment : Fragment() {
     ): View? {
         //_binding = FragmentSecondBinding.inflate(inflater, container, false)
         val parseViewModel = ViewModelProvider(this).get(ParseViewModel::class.java)
-        GlobalScope.launch {
+        GlobalScope.async {
             withContext(Dispatchers.Main){
                 parseViewModel.parseJson()
             }
