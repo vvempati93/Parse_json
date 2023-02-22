@@ -5,8 +5,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -16,9 +18,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun ListComposable(countries: List<CountryInfo>?) {
+fun ListComposable( viewModel: ParseViewModel) {
+    val countries = viewModel.countriesList
     if (countries != null) {
-        LazyColumn {
+        // this remember should remember the scroll position of the list scroll even on rotation as long as the fragment is alive
+        //because it's tied to the fragment's lifecycle
+        val lazyListState = rememberLazyListState()
+        LazyColumn(state = lazyListState) {
             items(countries) { country ->
                 CountryRow(
                     countryName = country.name,
