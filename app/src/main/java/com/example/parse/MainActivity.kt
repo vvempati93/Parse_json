@@ -38,12 +38,16 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
 
         val viewModel: ParseViewModel by viewModels()
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect {
-                    viewModel.parseJson()
+        try {
+            lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModel.uiState.collect {
+                        viewModel.parseJson()
+                    }
                 }
             }
+        }catch (e: java.lang.Exception){
+            println("The exception $e")
         }
 
         binding.fab.setOnClickListener { view ->
