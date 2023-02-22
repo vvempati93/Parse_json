@@ -22,31 +22,30 @@ class SecondFragment : Fragment() {
 
     // This property is only valid between onCreateView and
     // onDestroyView.
-    //private val binding get() = _binding!!
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         //_binding = FragmentSecondBinding.inflate(inflater, container, false)
+        var list = mutableListOf<CountryInfo>()
+        GlobalScope.launch {
+            val job = CoroutineScope(Dispatchers.Main).launch {
+                withContext(Dispatchers.Main) {
+                    parseViewModel.parseJson()?.let { list.addAll(it) }
+                }
+            }
+            job.join()
+        }
 
         return ComposeView(requireContext()).apply {
             setContent {
-                ListComposable(parseViewModel)
+                ListComposable(list)
             }
         }
         //return binding.root
 
-    }
-
-    fun runJob(){
-        suspend {
-            GlobalScope.async {
-                withContext(Dispatchers.Main) {
-                    parseViewModel.parseJson()
-                }
-            }
-        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -18,8 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun ListComposable( viewModel: ParseViewModel) {
-    val countries = viewModel.countriesList
+fun ListComposable( countries: List<CountryInfo>?) {
     if (countries != null) {
         // this remember should remember the scroll position of the list scroll even on rotation as long as the fragment is alive
         //because it's tied to the fragment's lifecycle
