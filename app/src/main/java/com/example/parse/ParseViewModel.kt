@@ -1,11 +1,17 @@
 package com.example.parse
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
 import org.json.JSONTokener
@@ -17,10 +23,11 @@ data class CountryInfo(val name: String,
                        val capital: String)
 data class CountriesListUIState(val list: List<CountryInfo>?)
 class ParseViewModel: ViewModel() {
-    var countriesList = mutableListOf<CountryInfo>()
-    // Expose screen UI state
-    private val _uiState = MutableStateFlow(CountriesListUIState(null))
-    val uiState: StateFlow<CountriesListUIState> = _uiState.asStateFlow()
+
+    private val _countriesList = mutableStateListOf<CountryInfo>()
+    var errorMessage: String by mutableStateOf("")
+    val todoList: List<CountryInfo>
+        get() = _countriesList
 
     fun parseJson(): List<CountryInfo>?{
         try {
@@ -37,18 +44,24 @@ class ParseViewModel: ViewModel() {
                 val countryInfo = CountryInfo(name,region, code, capital)
                 formattedList.add(countryInfo)
             }
-            countriesList.clear()
-            countriesList.addAll(formattedList)
-            _uiState.update { currentState ->
-                currentState.copy(
-                    list = countriesList
-                )
-            }
             return formattedList
             Log.d("Testing We Got API Response", apiResponse)
         }catch (error: Error){
             println("This is the error ")
         }
         return null
+    }
+
+    fun getCountriesList(){
+        viewModelScope.launch {
+            val apiService = APIService.getInstance()
+            try {
+                _countriesList.clear()
+                _countriesList.addAll(apiService.getCountries())
+
+            } catch (e: Exception) {
+                errorMessage = e.message.toString()
+            }
+        }
     }
 }
