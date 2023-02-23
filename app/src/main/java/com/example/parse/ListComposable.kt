@@ -18,11 +18,13 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.job
+import kotlinx.coroutines.launch
 
 @Composable
 fun ListComposable(viewModel: ParseViewModel) {
     LaunchedEffect(Unit, block = {
-        viewModel.getCountriesList()
+        viewModel.parseJson()
     })
         // this remember should remember the scroll position of the list scroll even on rotation as long as the fragment is alive
         //because it's tied to the fragment's lifecycle

@@ -30,8 +30,9 @@ class ParseViewModel: ViewModel() {
         get() = _countriesList
 
     fun parseJson(): List<CountryInfo>?{
+        viewModelScope.launch {
         try {
-            val apiResponse = URL("https://gist.githubusercontent.com/peymano-wmt/32dcb892b06648910ddd40406e37fdab/raw/db25946fd77c5873b0303b858e861ce724e0dcd0/countries.json").readText()
+            val apiResponse = URL("https://gist.githubusercontent.com/peymano-wmt/32dcb892b06648910ddd40406e37fdab/raw/db25946fd77c5873b0303b858e861ce724e0dcd0/countries.json/").readText()
             println(apiResponse)
             val formattedList = mutableListOf<CountryInfo>()
             //format apiResponse into list
@@ -44,11 +45,12 @@ class ParseViewModel: ViewModel() {
                 val countryInfo = CountryInfo(name,region, code, capital)
                 formattedList.add(countryInfo)
             }
-            return formattedList
+            _countriesList.clear()
+            _countriesList.addAll(formattedList)
             Log.d("Testing We Got API Response", apiResponse)
         }catch (error: Error){
             println("This is the error ")
-        }
+        }}
         return null
     }
 
@@ -57,7 +59,8 @@ class ParseViewModel: ViewModel() {
             val apiService = APIService.getInstance()
             try {
                 _countriesList.clear()
-                _countriesList.addAll(apiService.getCountries())
+                val countriesList = apiService.getCountries()
+                _countriesList.addAll(countriesList)
 
             } catch (e: Exception) {
                 errorMessage = e.message.toString()

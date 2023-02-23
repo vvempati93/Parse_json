@@ -33,6 +33,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val viewModel = ParseViewModel()
+        suspend {  viewModel.parseJson() }
         super.onCreate(savedInstanceState)
         setContent {
             MaterialTheme {
