@@ -26,7 +26,7 @@ class ParseViewModel: ViewModel() {
 
     private val _countriesList = mutableStateListOf<CountryInfo>()
     var errorMessage: String by mutableStateOf("")
-    val todoList: List<CountryInfo>
+    val countriesList: List<CountryInfo>
         get() = _countriesList
 
     fun parseJson(): List<CountryInfo>?{
